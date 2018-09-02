@@ -6,8 +6,8 @@ app.use(cors);
 server.listen(process.env.PORT || 5000);
 // WARNING: app.listen(80) will NOT work here!
 
-const connections = [];
-const playlist = [];
+connections = [];
+playlist = [];
 
 io.on('connection', (socket) => {
 
@@ -26,8 +26,8 @@ io.on('connection', (socket) => {
     io.sockets.emit('get playlist', playlist);
   });
 
-  socket.on('sort songs', (playlist) => {
-    playlist = playlist;
+  socket.on('sort songs', (list) => {
+    playlist = list;
     io.sockets.emit('get playlist', playlist);
   });
 
