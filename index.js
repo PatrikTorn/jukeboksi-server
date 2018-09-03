@@ -17,7 +17,7 @@ io.on('connection', (socket) => {
   console.log('connected', connections.length);
 
   socket.on('disconnect', () => {
-    connections.splice(connections.indexOf(socket));
+    connections.splice(connections.indexOf(socket), 1);
     io.sockets.emit('get connections', connections.length);
     console.log('disconnected', connections.length);
   });
