@@ -12,12 +12,13 @@ playlist = [];
 io.on('connection', (socket) => {
 
   socket.emit('get playlist', playlist);
-  io.sockets.emit('get connections', connections.length);
   connections.push(socket);
+  io.sockets.emit('get connections', connections.length);
   console.log('connected', connections.length);
 
   socket.on('disconnect', () => {
     connections.splice(connections.indexOf(socket));
+    io.sockets.emit('get connections', connections.length);
     console.log('disconnected', connections.length);
   });
 
