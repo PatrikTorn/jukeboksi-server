@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
     room = rooms.find(r => r.room === socket.room);
     room.playlist.push(song);
     io.sockets.in(room.room).emit('get playlist', room.playlist);
+    console.log(rooms);
   });
 
   socket.on('join room', (room) => {
@@ -32,9 +33,9 @@ io.on('connection', (socket) => {
     socket.room = room;
     connections.push({socket, room});
     io.sockets.in(room).emit('get connections', connections.filter(c => c.room === room).length);
-    socket.emit('join room', room);
+    // socket.emit('join room', room);
     socket.emit('get playlist', rooms.find(r => r.room === room).playlist);
-    console.log('connected', connections.filter(c => c.room === room).length);
+    console.log('join room and get playlist');
   });
 
   socket.on('exit room', (room) => {
@@ -42,8 +43,8 @@ io.on('connection', (socket) => {
     socket.room = null;
     connections.splice(connections.findIndex(c => c.socket === socket), 1);
     io.sockets.in(room).emit('get connections', connections.filter(c => c.room === room).length);
-    socket.emit('exit room');
-    socket.emit('get playlist', []);
+    // socket.emit('exit room');
+    // socket.emit('get playlist', []);
   });
 
   socket.on('create room', (room) => {
