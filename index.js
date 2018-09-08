@@ -25,9 +25,9 @@ io.on('connection', (socket) => {
   socket.on('add song', (song) => {
     room = rooms.find(r => r.room === socket.room);
     room.playlist.push(song);
+    io.sockets.in('lobby').emit('get room playlist', socket.room, room.playlist);
     io.sockets.in(room.room).emit('get playlist', room.playlist);
-    io.sockets.emit('get rooms', rooms);
-    console.log(rooms);
+    console.log('add song');
   });
 
   socket.on('join room', (room) => {
@@ -37,16 +37,19 @@ io.on('connection', (socket) => {
     rooms = rooms.map(r => r.room === room ? {...r, connections:[...r.connections, socket.name].filter((a,i,s) => s.indexOf(a) === i)} : r);
     io.sockets.in(room).emit('get connections', rooms.find(r => r.room === room).connections);
     socket.emit('get playlist', rooms.find(r => r.room === room).playlist);
-    io.sockets.in('lobby').emit('get rooms', rooms);
+    // io.sockets.in('lobby').emit('get rooms', rooms);
+    io.sockets.in('lobby').emit('get room connections', room, rooms.find(r => r.room === room).connections);
     console.log('join room', rooms.map(r => r.connections));
   });
 
   socket.on('exit room', (room) => {
     socket.leave(room);
+    socket.join('lobby');
     socket.room = null;
     rooms = rooms.map(r => r.room === room ? {...r, connections:r.connections.filter(c => c !== socket.name)} : r);
+    socket.emit('get rooms', rooms);
     io.sockets.in(room).emit('get connections', rooms.find(r => r.room === room).connections);
-    io.sockets.in('lobby').emit('get rooms', rooms);
+    io.sockets.in('lobby').emit('get room connections', room, rooms.find(r => r.room === room).connections);
     console.log(rooms.map(r => r.connections));
   });
 
@@ -75,6 +78,7 @@ io.on('connection', (socket) => {
   socket.on('delete song', (songId) => {
     room = rooms.find(r => r.room === socket.room);
     room.playlist.splice(room.playlist.findIndex(pl => pl.id === songId), 1);
+    io.sockets.in('lobby').emit('get room playlist', socket.room, room.playlist);
     io.sockets.in(room.room).emit('get playlist', room.playlist);
   });
 
