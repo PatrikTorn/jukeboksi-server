@@ -14,16 +14,12 @@ io.on('connection', (socket) => {
   socket.name = uuid();
   socket.join('lobby');
   socket.emit('get rooms', rooms);
-  connections.push(socket);
-  console.log('connected', connections.length);
 
   socket.on('disconnect', (reason) => {
     io.sockets.emit('disconnect', reason);
     rooms = rooms.map(r => r.room === socket.room ? {...r, connections:r.connections.filter(c => c !== socket.name)} : r);
     socket.room && io.sockets.to(socket.room).emit('get connections', rooms.find(r => r.room === socket.room).connections);
     io.sockets.to('lobby').emit('get rooms', rooms);
-    connections.splice(connections.indexOf(socket), 1);
-    console.log('disconnected', connections.length, reason);
   });
 
   socket.on('add song', (song) => {
@@ -35,7 +31,7 @@ io.on('connection', (socket) => {
       console.log('add song');
     }
   });
-
+// disconnected transport close
   socket.on('join room', (room) => {
     socket.leave('lobby', () => {
       socket.join(room, () => {
